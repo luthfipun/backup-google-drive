@@ -1,6 +1,0 @@
-2021.12.30, 17:34:41.0481 UTC -> Successfully connected to Mysql DB
-2021.12.30, 17:34:48.0603 UTC -> Successfully connected to Mysql DB
-2021.12.30, 17:35:35.0610 UTC -> Successfully connected to Mysql DB
-2021.12.30, 17:35:45.0287 UTC -> Access denied for user 'roots'@'172.17.0.1' (using password: YES)
-2021.12.30, 17:36:47.0828 UTC -> Access denied for user 'roots'@'172.17.0.1' (using password: YES)
-2021.12.30, 17:37:02.0635 UTC -> Successfully connected to Mysql DB
