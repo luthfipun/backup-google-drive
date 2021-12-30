@@ -1,6 +1,12 @@
 require('dotenv').config();
 const mysqlConnection = require('./mysql/connection.js');
 
-const checkDB = mysqlConnection;
+mysqlConnection.connect(function(err){
 
-console.log(checkDB);
+    if(err){
+        console.log(err.message)
+        return
+    }
+
+    console.log('connected!')
+})
