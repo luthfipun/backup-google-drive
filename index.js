@@ -1,12 +1,13 @@
 require('dotenv').config();
-const mysqlConnection = require('./mysql/connection.js');
+const mysqlConfig = require('./mysql/config.js');
+const {logging} = require('./log/config.js');
 
-mysqlConnection.connect(function(err){
+mysqlConfig.connect(function(err){
 
     if(err){
-        console.log(err.message)
+        logging(err.message)
         return
     }
 
-    console.log('connected!')
+    logging('Successfully connected to Mysql DB');
 })
