@@ -1,14 +1,18 @@
+import { rejects } from 'assert';
 import dotenv from 'dotenv';
 dotenv.config();
 
 import fs from 'fs';
 import mysql from 'mysql2';
 import mysqldump  from 'mysqldump';
+import { resolve } from 'path';
+import { uploadDB } from '../gdrive/config.js';
 import { logging } from '../log/config.js';
 import { currentTime } from '../utils/index.js';
 
 const tempDir = './temp/mysql';
-const currentName = `${tempDir}/DB_BACKUP__${currentTime()}.sql`;
+const prefixName = process.env.PREFIX_BACKUP_NAME || 'DB_BACKUP__';
+const currentName = `${prefixName+currentTime()}.sql`;
 
 const configDB = {
     host: process.env.MYSQL_HOST || 'localhost',
@@ -27,29 +31,43 @@ export const initBackup = async () => {
         return
     }
 
-    connection.connect(async function(err){
-        if(err){
-            logging(err.message)
-            return
-        }
-    
-        logging('Successfully connected to Mysql DB');
+    let startConnection = new Promise((resolve, rejects) => {
+        connection.connect(async function(err){
+            if(err){
+                rejects(err.message)
+                return
+            }
+            resolve('Successfully connected to Mysql DB')
+        })
+    })
+
+    startConnection.then(async (msg) => {
+        logging(msg)
         await startBackup()
+    }, reason => {
+        logging(reason)
     })
 }
 
 const startBackup = async () => {
     checkDir()
 
-    await mysqldump({
-        connection: configDB,
-        dumpToFile: currentName
-    }).then(() => {
-        logging('Successfully import MySQL database')
-        uploadDB()
-    }).catch((err) => {
-        logging(err.message)
-        return
+    let backUpData = new Promise(async (resolve, rejects) => {
+        await mysqldump({
+            connection: configDB,
+            dumpToFile: `${tempDir}/${currentName}`
+        }).then(() => {
+            resolve('Successfully import MySQL database')
+        }).catch((err) => {
+            rejects(err.message)
+        })
+    })
+    
+    backUpData.then(async (msg) => {
+        logging(msg)
+        await uploadDB(tempDir, currentName)
+    }, reason => {
+        logging(reason)
     })
 }
 
@@ -58,8 +76,4 @@ const checkDir = () => {
         fs.mkdirSync(tempDir, { recursive: true});
         fs.chmodSync(tempDir, '0755')
     }
-}
-
-const uploadDB = () => {
-    console.log('upload Db')
 }
