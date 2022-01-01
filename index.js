@@ -1,3 +1,8 @@
+import { cleanLog, cleanTemp } from './log/config.js';
 import { initBackup } from './mysql/config.js';
 
-initBackup()
+(async() => {
+    await cleanTemp()
+    await cleanLog()
+    await initBackup()
+})()
