@@ -9,6 +9,7 @@
   "author": "Luthfi Abdul Azis",
   "license": "ISC",
   "dependencies": {
+    "bree": "^7.1.4",
     "dateformat": "^5.0.2",
     "dotenv": "^10.0.0",
     "googleapis": "^92.0.0",
