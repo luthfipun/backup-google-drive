@@ -7,7 +7,7 @@ Simple backup data and database to Cloud (Google Drive) service account and shar
 - Backup compressed data (like as images, video etc) (coming soon)
 
 ## **Installation**
-- Make sure your mechine has installed **NodeJS**
+- Make sure your machine has installed **NodeJS**
 - Clone this project and run
     ```
     npm install // or
@@ -15,10 +15,10 @@ Simple backup data and database to Cloud (Google Drive) service account and shar
     ```
 
 ## **Configuration**
-- Open file `.env` on the root project for setup configuration and fill configuration MySQL credentials and other filled what you want
+- Open file [`.env`](https://github.com/luthfipun/backup-google-drive/blob/main/.env) on the root project for setup configuration and fill configuration MySQL credentials and other filled what you want
 - Create google service account on [this](https://support.google.com/a/answer/7378726?hl=en) tutorial and enable **Google Drive API** on [Google Console](https://console.developers.google.com/apis/api/drive/overview)
 - Download Service Account JSON Client file and put to `gdrive/account/` rename with `service-account.json`
-- Open `index.js` set interval backup what you want, for this example run backup every 6 hours, see interval documentation on [this](https://github.com/agenda/human-interval)
+- Open [`index.js`](https://github.com/luthfipun/backup-google-drive/blob/main/index.js) set interval backup what you want, for this example run backup every 6 hours, see interval documentation on [this](https://github.com/agenda/human-interval)
     ```
     interval: '6 hours'
     ```
