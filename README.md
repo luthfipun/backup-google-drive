@@ -1,13 +1,17 @@
 
 # Backup to Google Drive
 Simple backup data and database to Cloud (Google Drive) service account and share to personal Google drive account
+
 <br/>
 <br/>
+
 ## **Planning Project**
 - Backup MySQL Database ✅
 - Backup compressed data (like as images, video etc) (coming soon)
+
 <br/>
 <br/>
+
 ## **Installation**
 - Make sure your mechine has installed **NodeJS**
 - Clone this project and run
