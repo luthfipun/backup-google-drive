@@ -2,15 +2,9 @@
 # Backup to Google Drive
 Simple backup data and database to Cloud (Google Drive) service account and share to personal Google drive account
 
-<br/>
-<br/>
-
 ## **Planning Project**
 - Backup MySQL Database ✅
 - Backup compressed data (like as images, video etc) (coming soon)
-
-<br/>
-<br/>
 
 ## **Installation**
 - Make sure your mechine has installed **NodeJS**
@@ -19,7 +13,6 @@ Simple backup data and database to Cloud (Google Drive) service account and shar
     npm install // or
     yarn install
     ```
-<br/>
 
 ## **Configuration**
 - Open file `.env` on the root project for setup configuration and fill configuration MySQL credentials and other filled what you want
@@ -29,14 +22,11 @@ Simple backup data and database to Cloud (Google Drive) service account and shar
     ```
     interval: '6 hours'
     ```
-<br/>
 
 ## **Run**
 ```
 node index.js
 ```
-
-<br/>
 
 ## **Optional**
 If you run on the server and want to autorun at startup, you can follow [this](https://gist.github.com/renatoargh/f84d1c3884d6c59a3a1b)
