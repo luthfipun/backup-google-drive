@@ -1,14 +1,12 @@
-import { rejects } from 'assert';
 import dotenv from 'dotenv';
-dotenv.config();
-
 import fs from 'fs';
 import mysql from 'mysql2';
-import mysqldump  from 'mysqldump';
-import { resolve } from 'path';
+import mysqldump from 'mysqldump';
 import { uploadDB } from '../gdrive/config.js';
 import { logging } from '../log/config.js';
-import { currentTime } from '../utils/index.js';
+import { closeApp, currentTime } from '../utils/index.js';
+dotenv.config();
+
 
 const tempDir = './temp/mysql';
 const prefixName = process.env.PREFIX_BACKUP_NAME || 'DB_BACKUP__';
@@ -35,7 +33,6 @@ export const initBackup = async () => {
         connection.connect(async function(err){
             if(err){
                 rejects(err.message)
-                return
             }
             resolve('Successfully connected to Mysql DB')
         })
@@ -46,6 +43,7 @@ export const initBackup = async () => {
         await startBackup()
     }, reason => {
         logging(reason)
+        closeApp()
     })
 }
 
@@ -68,6 +66,7 @@ const startBackup = async () => {
         await uploadDB(tempDir, currentName)
     }, reason => {
         logging(reason)
+        closeApp()
     })
 }
 

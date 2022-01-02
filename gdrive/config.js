@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
-dotenv.config();
-
 import fs from 'fs';
 import { google } from "googleapis";
 import { logging } from "../log/config.js";
+import { closeApp } from '../utils/index.js';
+dotenv.config();
+
 
 const auth = new google.auth.GoogleAuth({
     keyFile: './gdrive/account/service-account.json',
@@ -43,21 +44,16 @@ export const uploadDB = async (path, name) => {
 
         }).catch((err) => {
             rejects(err.message)
-            return
         })
     })
 
     startUpload.then(async(id) => {
         await requestPermission(id, name)
-        logging('Backup data successfully')
     }, reason => {
         logging(reason)
         logging('Backup data failed')
+        closeApp()
     })
-    .then(() => {
-        process.exit()
-    })
-
 }
 
 const requestPermission = async (fileId, name) => {
@@ -69,21 +65,32 @@ const requestPermission = async (fileId, name) => {
         'role': 'writer',
         'emailAddress': personalEmail
     }
+    let setPermission = new Promise(async(resolve, rejects) => {
+        await drive.permissions.create({
+            resource: mediaPermission,
+            fileId: fileId,
+            fields: 'id'
+        }).then((res) => {
+    
+            if(res.status !== 200){
+                rejects(`Failed to set permission for files ${name} with status code ${res.status}`)
+            }
 
-    await drive.permissions.create({
-        resource: mediaPermission,
-        fileId: fileId,
-        fields: 'id'
-    }).then((res) => {
+            logging(`Successfully set permission for files ${name}`)
+            resolve('Backup data successfully')
 
-        if(res.status !== 200){
-            logging(`Failed to set permission for files ${name} with status code ${res.status}`)
-            return
-        }
-
-        logging(`Successfully set permission for files ${name}`)
-    }).catch((err) => {
-        logging(err.message)
+        }).catch((err) => {
+            rejects(err.message)
+        })
     })
     
+    setPermission.then((msg) => {
+        logging(msg)
+
+        setTimeout(() => {
+            closeApp()
+        }, 3000);
+    }, reason => {
+        logging(reason)
+    });
 }

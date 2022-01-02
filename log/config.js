@@ -15,7 +15,7 @@ export const logging = (msg) => {
 export const cleanLog = () => {
     try {
         const stats = fs.statSync(fileName);
-        if ((stats.size * 1024 * 1024) > maxLogSize){
+        if (stats.size > (maxLogSize * 1024 * 1024)){
             fs.unlinkSync(fileName)
         }
     } catch (err) {}

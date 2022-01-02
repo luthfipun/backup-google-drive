@@ -1,8 +1,16 @@
-import { cleanLog, cleanTemp } from './log/config.js';
-import { initBackup } from './mysql/config.js';
+import Bree from 'bree';
 
-(async() => {
-    await cleanTemp()
-    await cleanLog()
-    await initBackup()
-})()
+(() => {
+
+    const bree = new Bree({
+        jobs: [
+            {
+                name: 'worker-backup-mysql',
+                interval: '6 hours'
+            }
+        ]
+    });
+
+    bree.start();
+
+})();
