@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { google } from "googleapis";
+import request from 'request';
 import { logging } from "../log/config.js";
 import { closeApp } from '../utils/index.js';
 dotenv.config();
@@ -17,16 +18,77 @@ const drive = google.drive({
 });
 
 export const uploadDB = async (path, name) => {
+
+    let stats = fs.statSync(`${path}/${name}`)
+
+    if(stats.size < (5 * 1024 * 1024)){
+        await uploadInstant(path, name)
+    }else {
+        await uploadLargeFile(path, name, stats.size)
+    }
+}
+
+// Upload for more than 5Mb size
+const uploadLargeFile = async (path, name, size) => {
+    let token = await auth.getAccessToken()
+    let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable';
+    let options = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({name: name}),
+        url: url,
+        method: 'POST'
+    }
+
+    logging('Starting upload file please wait...')
+
+    await request(url, options, async(err, res) => {
+        if(err){
+            logging(err.message)
+            return
+        }
+
+        if(res.statusCode !== 200){
+            logging(res.statusMessage)
+            return
+        }
+
+        await request({
+            method: 'PUT',
+            url: res.headers.location,
+            headers: {
+                'Content-Range': `bytes 0-${size - 1}/${size}`
+            },
+            body: fs.readFileSync(`${path}/${name}`)
+        }, (errorUpload, responseUpload, bodyUpload) => {
+            if(errorUpload){
+                logging(errorUpload.message)
+                return
+            }
+
+            if(responseUpload.statusCode === 200){
+                logging('Successfully upload files ' + name)
+                let body = JSON.parse(bodyUpload)
+                requestPermission(body.id, name)
+            }
+        })
+    })
+}
+
+// Upload instant for less than 5Mb size
+const uploadInstant = async (path, name) => {
     let fileMetaData = {
         'name': name,
         'mimeType': 'application/vnd.google-apps.file'
     }
-
+    
     let mediaType = {
         mimeType: 'text/plain',
         body: fs.createReadStream(`${path}/${name}`)
     }
-
+    
     let startUpload = new Promise(async(resolve, rejects) => {
         await drive.files.create({
             resource: fileMetaData,
@@ -41,12 +103,12 @@ export const uploadDB = async (path, name) => {
     
             logging('Successfully upload files ' + name)
             resolve(res.data.id)
-
+    
         }).catch((err) => {
             rejects(err.message)
         })
     })
-
+    
     startUpload.then(async(id) => {
         await requestPermission(id, name)
     }, reason => {
